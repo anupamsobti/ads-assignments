@@ -24,8 +24,8 @@ def hierarchy_pos(G, root, width=1., vert_gap = 0.2, vert_loc = 0, xcenter = 0.5
     else:
         pos[root] = (xcenter, vert_loc)
     neighbors = G.neighbors(root)
-    if parent != None:
-        neighbors.remove(parent)
+    #if parent != None:
+    #    neighbors.remove(parent)
     if len(neighbors)!=0:
         dx = width/len(neighbors) 
         nextx = xcenter - width/2 - dx/2
@@ -39,21 +39,10 @@ def hierarchy_pos(G, root, width=1., vert_gap = 0.2, vert_loc = 0, xcenter = 0.5
 def createDiagram(tree):
     G = nx.DiGraph()
     populateNode(G,tree)
-    # write dot file to use with graphviz
-    # run "dot -Tpng test.dot >test.png"
-    #nx.nx_agraph.write_dot(G,'test.dot')
-    #
-    ## same layout using matplotlib with no labels
-    #plt.title("draw_networkx")
-    #pos=nx.graphviz_layout(G,prog='dot')
-    #nx.draw(G,pos,with_labels=False,arrows=False)
-    #plt.savefig('nx_test.png')
-
 
     plt.title("NX Tree")
-    nx.draw_networkx(G)
-    #pos = hierarchy_pos(G,5)
-    #nx.draw(G,5,pos=pos,with_labels=True)
+    pos = hierarchy_pos(G,5)
+    nx.draw_networkx(G,pos)
     plt.show()
 
 def populateNode(G,treeNode):
@@ -68,6 +57,10 @@ def populateNode(G,treeNode):
 t = Tree(5)
 t.leftChild = Tree(4)
 t.rightChild = Tree(3)
+t.rightChild.leftChild = Tree(123)
 t.leftChild.leftChild = Tree(1)
 t.leftChild.rightChild = Tree(0)
+t.leftChild.leftChild = Tree(7)
+t.leftChild.leftChild.leftChild = Tree(8)
+
 createDiagram(t)
