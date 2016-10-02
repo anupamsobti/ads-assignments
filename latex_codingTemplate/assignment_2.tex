@@ -145,12 +145,12 @@
 %	NAME AND CLASS SECTION
 %----------------------------------------------------------------------------------------
 
-\newcommand{\hmwkTitle}{Programming\ Exercise\ \#1} % Assignment title
+\newcommand{\hmwkTitle}{Assignment\ \#1} % Assignment title
 \newcommand{\hmwkDueDate}{Monday,\ January\ 1,\ 2012} % Due date
-\newcommand{\hmwkClass}{Advanced\ Data\ Structures\ COL702} % Course/class
+\newcommand{\hmwkClass}{COMPSCI\ 101} % Course/class
 \newcommand{\hmwkClassTime}{10:30am} % Class/lecture time
-\newcommand{\hmwkClassInstructor}{S.N.Maheshwari} % Teacher/lecturer
-\newcommand{\hmwkAuthorName}{Anupam Sobti} % Your name
+\newcommand{\hmwkClassInstructor}{Jones} % Teacher/lecturer
+\newcommand{\hmwkAuthorName}{John Smith} % Your name
 
 %----------------------------------------------------------------------------------------
 %	TITLE PAGE
@@ -158,13 +158,14 @@
 
 \title{
 \vspace{2in}
-\textmd{\textbf{\hmwkClass\newline \hmwkTitle}}\\
-\vspace{0.1in}\large{\textit{\hmwkClassInstructor}}
+\textmd{\textbf{\hmwkClass:\ \hmwkTitle}}\\
+\normalsize\vspace{0.1in}\small{Due\ on\ \hmwkDueDate}\\
+\vspace{0.1in}\large{\textit{\hmwkClassInstructor\ \hmwkClassTime}}
 \vspace{3in}
 }
 
 \author{\textbf{\hmwkAuthorName}}
-\date{2015ANZ8497} % Insert date here if you want it to appear below your name
+\date{} % Insert date here if you want it to appear below your name
 
 %----------------------------------------------------------------------------------------
 
@@ -189,24 +190,11 @@
 % To have just one problem per page, simply put a \clearpage after each problem
 
 \begin{homeworkProblem}
-%Listing \ref{homework_example} shows a Perl script.
+Listing \ref{homework_example} shows a Perl script.
 
-%\perlscript{homework_example}{Sample Perl Script With Highlighting}
+\perlscript{homework_example}{Sample Perl Script With Highlighting}
 
-%\lipsum[1]
-Explain the insertion/deletion and access operations in 2-3 Trees.
-
-\medskip
-
-\problemAnswer{
-Data is maintained on leaf nodes and the discriminant values are maintained on the internal nodes of the tree. An internal node has two values. The first value represents the largest value in the left subtree and the second value represents the largest value in the middle subtree if it exists.
-
-\textbf{Base Case:}\\
-The first node is maintained as a leaf node. When the second value is inserted, one internal node is made the root which contains the smaller of the two leaves as the discriminant value.
-
-\textbf{Insertion : Case 1}\\
-The node returned by search 
-	}
+\lipsum[1]
 \end{homeworkProblem}
 
 %----------------------------------------------------------------------------------------
