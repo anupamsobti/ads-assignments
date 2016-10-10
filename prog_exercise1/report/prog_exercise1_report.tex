@@ -47,7 +47,7 @@
 % Set up the header and footer
 \pagestyle{fancy}
 \lhead{\hmwkAuthorName} % Top left header
-\chead{\hmwkClass\ (\hmwkClassInstructor\ \hmwkClassTime): \hmwkTitle} % Top center head
+\chead{\hmwkTitle} % Top center head
 \rhead{\firstxmark} % Top right header
 \lfoot{\lastxmark} % Bottom left footer
 \cfoot{} % Bottom center footer
@@ -285,10 +285,80 @@ There are two types of rotations : Zig-zig and Zig-zag (both left and right). Th
 The heights of the nodes have to be updated after the rotation and the balance is restored.
 
 \medskip
-\textbf{Delete Operation : }\textit{Tree.delete(x)}
+\textbf{Delete Operation : }\textit{Tree.delete(x)}\\
+Let a node w is deleted. The reduction in height may cause the tree to be unbalanced. While moving towards the root from $w$, let $z$ be the node which is unbalanced. $y$ is the child of $z$ with greater height and $x$ is the child of $y$ with greater height. $x$,$y$ and $z$ will require a rotation similar to the rotations just discussed in order to bring the balance back at the root of this subtree (intially $z$). If the height of this subtree decreases after this rotation, the process has to be recursively done, going towards the root.
 	}
 \end{homeworkProblem}
 
+%----------------------------------------------------------------------------------------
+%	PROBLEM 3
+%----------------------------------------------------------------------------------------
+
+\newpage
+\begin{homeworkProblem}
+Explain insertion/deletion/search in Skip Lists.
+
+\medskip
+\problemAnswer{
+Skip lists are arranged in a data structure where all the elements are present at the $0^{th}$ level in a doubly linked list. Now, roughly half of the these elements are stacked onto this level with vertical links to the elements on the $0^{th}$ level apart from the horizontally linked doubly linked list. This continues till $log(n)$ levels where $n$ is the number of elements in the list.
+
+\medskip
+\textbf{Search Operation : }$List.Search(x)$\\
+The search operation begins at the topmost level. Let's say the current element under traversal is $e$. If $x < e$, we go to a level below the current level and go to the next element horizontally until $x \neq e$ or we are at the bottom level or $e$ is the first element in the list. The function returns $(True,e)$ if $x = e$; $(False,e)$ otherwise.
+
+\medskip
+\textbf{Insert Operation : }$List.Insert(x)$\\
+The insert operation starts with a search operation for the element to be inserted. The search would return the element just greater than $x$ if $x$ isn't present already. The element is inserted at the bottom level and the height is then increased by 1 depending on the output of a random function which returns only 1s and 0s. If the function returns 1, the height is increased, meaning that the link for this element is contained in the level above the current level and linked with the element before and after the same. A similar process is then repeated for the next level until the random function outputs 0.
+
+\medskip
+\textbf{Delete Operation : }$List.Delete(x)$\\
+The delete operation is carried out be firstly searching the element in the list. The node returned by the search operation is first deleted and then the deletion is carried out on the level above it if the element exists on the same. The maintained total number of elements determines the length of sentinels (towers bounding the elements in the list).
+}
+\end{homeworkProblem}
+
+%----------------------------------------------------------------------------------------
+%	PROBLEM 4
+%----------------------------------------------------------------------------------------
+
+\pagebreak
+\begin{homeworkProblem}
+Explain search/insert/delete operations in Red-Black Trees.
+
+\medskip
+\problemAnswer{
+Data is maintained on the leaves and the internal nodes keep the discriminant values. The discriminant value is the largest value in the left subtree.
+
+\medskip
+\textbf{Search Operation : }$Tree.Search(x)$\\
+The search operation is same as the binary search tree. Let the current node be $e$, then until $e$ is a leaf, $e = leftchild\ of\ e$ if $x \leq e$ else $e = rightchild\ of\ e$. If the leaf node = $x$, return $(True,leafNodeReference)$ else return $(False,leafNodeReference)$.
+
+\medskip
+\textbf{Insert Operation : }$Tree.Insert(x)$\\
+Insertion begins with a search operation which returns the reference to the leaf whose parent will be the parent of $x$ when inserted. The insertion process is explained here synonymous to the insertion in 2-4 trees.\\
+\textbf{Base Case}\\
+A single value is maintained as a leaf. When another value is added, a black node is instantiated. The smaller of the two values becomes the left child and the larger becomes the right. The value in the node is the left child (discriminant value).\\
+\textbf{Insertion Case 1}\\
+When the leaf is to be inserted into a black colored node whose both children are black/leaves, a red node is instantiated. The three values (two existing nodes and $x$) are then made children of the red node and right child of the black node.\\
+\textbf{Insertion Case 2}\\
+When the leaf is to be inserted into a black node which has a black child and a red child, another red node is instantiated which is made the children of the black node. The newly inserted red node has the black child and $x$ as it's children.\\
+\textbf{Insertion : Case 3}\\
+When the leaf is to be inserted into a red node which has a red sibling, the red node is removed and one of the children of the red node are made the children of the black node which was the parent of the red node. Another black node is instantiated which is recursively inserted into the grandparent of the red node.\\
+
+\medskip
+\textbf{Deletion Operation : }$Tree.delete(x)$\\
+\textbf{Deletion Case 1}\\
+The node is found using the search operation. If the parent is a red node, the red node and the node returned by the search are deleted and the remaining child is made the direct child of the black node. The discriminant value is recalculated for the path of deletion until the discriminant value is equal to the already stored discriminant value.\\
+\textbf{Deletion Case 2}\\
+The parent of the node being deleted is black with the other child being red. The red node is deleted and the children of the red node are made the children of the black parent.\\
+\textbf{Deletion Case 3}\\
+The parent of the node being deleted is black with the other child being black. The sibling of the parent has a red child. The red node is deleted and of the children of the red node replaces the deleted node. The other child of the red node is made a direct child to the black parent of the red node.\\
+}
+\pagebreak
+\problemAnswer{
+\textbf{Deletion Case 4}\\
+The parent of the node being deleted is black with the other child being black but the sibling of the parent doesn't have a red child. The parent of the node being deleted is deleted too. The other child of this parent is then made a child of a newly instantiated red node which is made the child of the black sibling. The other child of the sibling is the black node which was already it's child. Since this reduces the number of nodes of the grandchild, the process has to be recursively repeated.
+	}
+\end{homeworkProblem}
 %----------------------------------------------------------------------------------------
 
 \end{document}
