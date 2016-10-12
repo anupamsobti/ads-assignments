@@ -2,6 +2,7 @@
 import matplotlib.pyplot as plt
 import networkx as nx
 
+#Drawing Functions
 def hierarchy_pos(G, root, width=1., vert_gap = 0.2, vert_loc = 0, xcenter = 0.5, 
                   pos = None, parent = None):
     '''If there is a cycle that is reachable from root, then this will see infinite recursion.
@@ -49,6 +50,8 @@ def populateNode(G,treeNode):
         populateNode(G,treeNode.rightChild)
         G.add_edge(treeNode.data,treeNode.rightChild.data)
 
+
+#AVL Tree class
 class AVLTree:
     def __init__(self,data=None,height=1,leftChild = None,rightChild = None,parent = None):
         self.data = data
@@ -115,29 +118,43 @@ class AVLTree:
                 self.leftChild.parent = self
 
                 updateHeights(self.leftChild,self.leftChild.height)
-                #balanceFromNode(self.leftChild)    
+                balancingResult = balanceFromNode(self.leftChild)    
+                if balancingResult == 0:
+                    return self
+                else:
             else:
                 self.leftChild.insertNode(value)
+                return self
         else:
             if self.rightChild == None:
                 self.rightChild = AVLTree(value)
                 self.rightChild.parent = self
                 
                 updateHeights(self.rightChild,self.rightChild.height)
-                #balanceFromNode(self.rightChild)
+                balanceFromNode(self.rightChild)
+
+                balancedTree = balanceFromNode(self.rightChild)
+                return balancedTree
                 
             else:
                 self.rightChild.insertNode(value)
+                return self
 
 def balanceFromNode(node):
     balancingResult = checkSubtreeBalance(node)
-    print ("Balancing from node", node.data)
-    if (not balancingResult[0]) and node.parent != None:
+    print ("Checking Subtree Balance", node.data,balancingResult)
+    if not balancingResult[0]:
+        print(balancingResult[1].data)
+
+    if (not balancingResult[0]) and node.parent != None and node.parent.parent != None:
         while node.parent.parent != balancingResult[1]:
             node=node.parent
         resultingRoot = rotate(node,node.parent,node.parent.parent)
-        print ("Resulting root : ", resultingRoot.data)
-        balanceFromNode(resultingRoot)
+        if resultingRoot.parent == None:
+            return resultingRoot
+        else:
+            return 0
+        #balanceFromNode(resultingRoot)
 
 #Update Heights
 def updateHeights(node,seed):
@@ -150,6 +167,7 @@ def updateHeights(node,seed):
         else:
             node = node.parent
             i+=1
+
 #Logic for checking balancing
 def checkSubtreeBalance(node):
     firstImbalanced = None
@@ -188,6 +206,9 @@ def rotate(nodeX,nodeY,nodeZ):
                 
                 nodeY.rightChild = nodeZ
                 nodeZ.parent = nodeY
+
+                #Updating heights
+                nodeZ.height -= 2
                 
                 return nodeY
 
@@ -201,6 +222,9 @@ def rotate(nodeX,nodeY,nodeZ):
             
             nodeX.leftChild = nodeY
             nodeY.parent = nodeX
+
+            nodeY.height -= 1
+            nodeX.height += 1
         
             rotate(nodeY,nodeX,nodeZ)
             
@@ -243,15 +267,15 @@ myTree = AVLTree(2)
 #print ("After inserting 2 : ")
 #myTree.inorder()
 print("Inserting 3.")
-myTree.insertNode(3)
+myTree = myTree.insertNode(3)
 print ("Inserting 5.")
-myTree.insertNode(5)
+myTree = myTree.insertNode(5)
 print("Inserting 1")
-myTree.insertNode(1)
+myTree = myTree.insertNode(1)
 print("Inserting 4")
-myTree.insertNode(4)
+myTree = myTree.insertNode(4)
 print("Inserting -1")
-myTree.insertNode(-1)
+myTree = myTree.insertNode(-1)
 #print("After inserting 3,5,1,4,-1")
 myTree.inorderWithHeight()
 print("")
