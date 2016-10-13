@@ -1,4 +1,109 @@
 #!/usr/bin/python3
+import random
+
+def largestValue(node):
+    if node.leaf:
+        return node.leafData
+    else:
+        return largestValue(node.rightChild)
+
+def insertInternalNode(node,sibling):   #The sibling from which it was separated and the node itself are inputs
+    nodeLargestValue = largestValue(node)
+    siblingLargestValue = largestValue(sibling)
+
+    siblingParent = sibling.parent
+
+    #Base case (A new root has to be created)
+    if siblingParent == None:
+        if nodeLargestValue < siblingLargestValue:
+            newNode = TwoThreeTree(leftChild = node,dvalue1 = nodeLargestValue,rightChild = sibling)
+        else:
+            newNode = TwoThreeTree(leftChild = sibling,dvalue1 = siblingLargestValue,rightChild = node)
+
+        node.parent = newNode
+        sibling.parent = newNode
+
+        return True,newNode
+
+    elif siblingParent.dvalue2 == None:    #Parent has only two children
+        if siblingParent.leftChild == sibling:
+            otherSibling = siblingParent.rightChild
+            siblingIsSmaller = True
+        else:
+            otherSibling = siblingParent.leftChild
+            siblingIsSmaller = False
+
+        otherSiblingLargestValue = largestValue(otherSibling)
+
+        if siblingIsSmaller and nodeLargestValue < siblingParent.dvalue1:
+            siblingParent.leftChild = node
+            node.parent = siblingParent
+            siblingParent.dvalue1 = nodeLargestValue
+            siblingParent.middleChild = sibling
+            siblingParent.dvalue2 = siblingLargestValue
+
+        elif (not siblingIsSmaller) and nodeLargestValue < siblingParent.dvalue1:
+            siblingParent.leftChild = node
+            node.parent = siblingParent
+            siblingParent.dvalue1 = nodeLargestValue
+            siblingParent.middleChild = otherSibling
+            siblingParent.dvalue2 = otherSiblingLargestValue
+
+        elif node.dvalue1 > siblingParent.dvalue1:
+            if siblingParent.rightChild.dvalue1 > node.dvalue1:
+                siblingParent.middleChild = node
+                node.parent = siblingParent
+                siblingParent.dvalue2 = nodeLargestValue
+            else:
+                siblingParent.middleChild = siblingParent.rightChild
+                siblingParent.rightChild = node
+                node.parent = siblingParent
+                siblingParent.dvalue2 = largestValue(siblingParent.middleChild)  #Can be made more efficient by using siblingIsSmaller
+
+        return False,siblingParent
+
+    else:   #Parent has 3 children
+        if node.dvalue1 < siblingParent.leftChild.dvalue1:
+            newNode = TwoThreeTree(dvalue1 = nodeLargestValue,leftChild = node,rightChild = siblingParent.leftChild)
+            node.parent = newNode
+            siblingParent.leftChild.parent = newNode
+            siblingParent.leftChild = siblingParent.middleChild
+            siblingParent.middleChild = None
+            siblingParent.dvalue1 = siblingParent.dvalue2
+            siblingParent.dvalue2 = None
+
+            return insertInternalNode(newNode,siblingParent)
+        elif node.dvalue1 < siblingParent.dvalue2:
+            newNode = TwoThreeTree(dvalue1 = largestValue(siblingParent.leftChild),leftChild = siblingParent.leftChild,rightChild = node)
+            node.parent = newNode
+            siblingParent.leftChild.parent = newNode
+            siblingParent.leftChild = siblingParent.middleChild
+            siblingParent.middleChild = None
+            siblingParent.dvalue1 = siblingParent.dvalue2
+            siblingParent.dvalue2 = None
+
+            return insertInternalNode(newNode,siblingParent)
+        else:   #Greater than both dvalue1 and dvalue2
+            if node.dvalue1 < siblingParent.rightChild.dvalue1:
+                newNode = TwoThreeTree(leftChild = node,rightChild = siblingParent.rightChild,dvalue1 = nodeLargestValue)
+                node.parent = newNode
+                siblingParent.rightChild.parent = newNode
+                siblingParent.dvalue2 = None
+                siblingParent.rightChild = siblingParent.middleChild
+                siblingParent.middleChild = None
+
+                return insertInternalNode(newNode,siblingParent)
+            else:
+                newNode = TwoThreeTree(leftChild = siblingParent.rightChild,rightChild = node,dvalue1 = largestValue(siblingParent.rightChild))
+                node.parent = newNode
+                siblingParent.rightChild.parent = newNode
+                siblingParent.dvalue2 = None
+                siblingParent.rightChild = siblingParent.middleChild
+                siblingParent.middleChild = None
+
+                return insertInternalNode(newNode,siblingParent)
+
+
 class TwoThreeTree():
     def __init__(self,dvalue1=None,dvalue2=None,leftChild=None,middleChild=None,rightChild=None,parent=None,leaf=False,leafData = None):
         self.dvalue1 = dvalue1
@@ -12,7 +117,10 @@ class TwoThreeTree():
 
     def insert(self,x):
         isPresent,y = self.search(x)  #Returns the leaf containing x or just > x
+        #print(x,y.leafData)
         if not isPresent:
+            z=y.parent
+
             #Base Case
             if y.parent == None:    #A single leaf is present in the tree
                 nodeForX = TwoThreeTree(leaf = True,leafData = x)   #A new leaf node for X
@@ -26,16 +134,24 @@ class TwoThreeTree():
             
             #If the node is inserted in an internal node with 2 children
             elif z.dvalue2 == None:
-                z = y.parent
                 nodeForX = TwoThreeTree(leaf=True,leafData = x,parent = z) #New Leaf node for X
-                z.middleChild = nodeForX 
-                z.rightChild = y
-                z.dvalue2 = x
+                if y == z.leftChild:
+                    z.middleChild = y
+                    z.leftChild = nodeForX
+                    z.dvalue1 = x
+                    z.dvalue2 = y.leafData
+                elif x < y.leafData:
+                    z.middleChild = nodeForX 
+                    z.rightChild = y
+                    z.dvalue2 = x
+                else:
+                    z.middleChild = y
+                    z.rightChild = nodeForX
+                    z.dvalue2 = y.leafData
 
             #if the node is inserted in an internal node with 3 children
             else:
-                z = y.parent
-                nodeForX = TwoThreeTree(leaf=True,leafData = x,parent = z) #New Leaf node for X
+                nodeForX = TwoThreeTree(leaf=True,leafData = x) #New Leaf node for X
                 if x < z.leftChild.leafData:
                     newInternalNode = TwoThreeTree(dvalue1 = x,leftChild = nodeForX,rightChild = z.leftChild)
                     nodeForX.parent = newInternalNode
@@ -46,7 +162,48 @@ class TwoThreeTree():
                     z.dvalue2 = None
                     z.middleChild = None
 
-                    ##Insert Internal Node to the sibling
+                    isRootNew,newRoot = insertInternalNode(newInternalNode,z)
+
+                    if isRootNew:
+                        self = newRoot
+                elif x < z.dvalue2:
+                    newInternalNode = TwoThreeTree(leftChild = z.leftChild,dvalue1 = z.dvalue1,rightChild = nodeForX)
+                    nodeForX.parent = newInternalNode
+                    z.leftChild.parent = newInternalNode
+
+                    z.leftChild = z.middleChild
+                    z.dvalue1 = z.dvalue2
+                    z.middleChild = None
+                    z.dvalue2 = None
+
+                    isRootNew,newRoot = insertInternalNode(newInternalNode,z)
+                    if isRootNew:
+                        self = newRoot
+                elif x < z.rightChild.leafData:
+                    newInternalNode = TwoThreeTree(leftChild = nodeForX,dvalue1 = x,rightChild = z.rightChild)
+                    nodeForX.parent = newInternalNode
+                    z.rightChild.parent = newInternalNode
+
+                    z.rightChild = z.middleChild
+                    z.dvalue2 = None
+                    z.middleChild = None
+
+                    isRootNew,newRoot = insertInternalNode(newInternalNode,z)
+                    if isRootNew:
+                        self = newRoot
+
+                else:
+                    newInternalNode = TwoThreeTree(leftChild = z.rightChild,dvalue1 = z.rightChild.leafData,rightChild = nodeForX)
+                    nodeForX.parent = newInternalNode
+                    z.rightChild.parent = newInternalNode
+
+                    z.rightChild = z.middleChild
+                    z.dvalue2 = None
+                    z.middleChild = None
+
+                    isRootNew,newRoot = insertInternalNode(newInternalNode,z)
+                    if isRootNew:
+                        self = newRoot
 
         return self
 
@@ -64,75 +221,34 @@ class TwoThreeTree():
         else:
             return self.rightChild.search(x)
 
-    def insertInternalNode(node,sibling):   #The sibling from which it was separated and the node itself are inputs
-        nodeLargestValue = largestValue(node)
-        siblingLargestValue = largestValue(sibling)
-
-        siblingParent = sibling.parent
-
-        #Base case (A new root has to be created)
-        if siblingParent == None:
-            if nodeLargestValue < siblingLargestValue:
-                newNode = TwoThreeTree(leftChild = node,dvalue1 = nodeLargestValue,rightChild = sibling)
-            else:
-                newNode = TwoThreeTree(leftChild = sibling,dvalue1 = siblingLargestValue,rightChild = node)
-
-            node.parent = newNode
-            sibling.parent = newNode
-
-            return newNode
-
-        elif siblingParent.dvalue2 == None:    #Parent has only two children
-            if siblingParent.leftChild == sibling:
-                otherSibling = siblingParent.rightChild
-                siblingIsSmaller = True
-            else:
-                otherSibling = siblingParent.leftChild
-                siblingIsSmaller = False
-
-            otherSiblingLargestValue = largestValue(otherSibling)
-
-            if siblingIsSmaller and nodeLargestValue < siblingParent.dvalue1:
-                siblingParent.leftChild = node
-                node.parent = siblingParent
-                siblingParent.dvalue1 = nodeLargestValue
-                siblingParent.middleChild = sibling
-                siblingParent.dvalue2 = siblingLargestValue
-
-            elif (not siblingIsSmaller) and nodeLargestValue < siblingParent.dvalue1:
-                siblingParent.leftChild = node
-                node.parent = siblingParent
-                siblingParent.dvalue1 = nodeLargestValue
-                siblingParent.middleChild = otherSibling
-                siblingParent.dvalue2 = otherSiblingLargestValue
-
-            elif node.dvalue1 > siblingParent.dvalue1:
-                if siblingParent.rightChild.dvalue1 > node.dvalue1:
-                    siblingParent.middleChild = node
-                    node.parent = siblingParent
-                    siblingParent.dvalue2 = nodeLargestValue
-                else:
-                    siblingParent.middleChild = siblingParent.rightChild
-                    siblingParent.rightChild = node
-                    node.parent = siblingParent
-                    siblingParent.dvalue2 = largestValue(siblingParent.rightChild)  #Can be made more efficient by using siblingIsSmaller
-
-            return siblingParent
-
-        else:   #Parent has 3 children
-            pass
-
-
-
-    def largestValue(node):
-        if node.leaf:
-            return node.leafData
+    def inOrder(self):
+        if self.leftChild != None:
+            self.leftChild.inOrder()
+        if self.middleChild != None:
+            self.middleChild.inOrder()
+        if self.leaf:
+            print("Leaf ",self.leafData)
         else:
-            return largestValue(node.rightChild)
+            print("IN Dvalue1 = ",self.dvalue1," Dvalue2 = ",self.dvalue2)
+        if self.rightChild != None:
+            self.rightChild.inOrder()
+
 
     def delete(self,x):
         pass
 
-myTree = TwoThreeTree(leaf=True,leafData=4)
+myTree = TwoThreeTree(leaf=True,leafData=8)
 myTree = myTree.insert(5)
-print(myTree.search(5))
+myTree = myTree.insert(4)
+myTree = myTree.insert(9)
+myTree = myTree.insert(3)
+myTree = myTree.insert(6)
+myTree = myTree.insert(10)
+myTree = myTree.insert(0)
+
+for i in range(1000):
+    #print("Inserting ",i)
+    myTree = myTree.insert(random.randrange(-1000,1000))
+
+print(myTree.search(3))
+#myTree.inOrder()
