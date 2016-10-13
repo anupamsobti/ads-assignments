@@ -235,7 +235,83 @@ class TwoThreeTree():
 
 
     def delete(self,x):
-        pass
+        isPresent,y = self.search(x)  #Returns the leaf containing x or just > x
+        if isPresent:
+            #Base case
+            z = y.parent
+            if z == None:    #only node in the tree
+                return None
+            elif z.parent == None and z.dvalue2 == None: #Only 2 leaves and 1 internal node
+                if z.leftChild == y:
+                    return z.rightChild
+                else:
+                    return z.leftChild
+            elif z.dvalue2 != None: #3 children
+                if y == z.leftChild:
+                    z.leftChild = z.middleChild
+                    z.middleChild = None
+                    z.dvalue1 = z.dvalue2
+                    z.dvalue2 = None
+                elif y == z.middleChild:
+                    z.middleChild = None
+                    z.dvalue2 = None
+                else:    #y == z.rightChild
+                    z.rightChild = z.middleChild
+                    z.middleChild = None
+                    z.dvalue2 = None
+            else:   #The node z (parent of y) has 2 children
+                if z.parent != None and z.parent.dvalue2 != None:   #z has 2 siblings
+                    if z == z.parent.leftChild:
+                        #Check if the middle child has 3 leaves. In this case, the other node can borrow one leaf
+                        if z.parent.middleChild.dvalue2 != None:
+                            if y == z.leftChild:
+                                z.leftChild = z.rightChild
+                                z.dvalue1 = z.leftChild.leafData
+                                z.rightChild = z.parent.middleChild.leftChild
+                                z.rightChild.parent = z
+                                
+                                z.parent.middleChild.leftChild = z.parent.middleChild.middleChild
+                                z.parent.middleChild.dvalue1 = z.parent.middleChild.dvalue2
+                                z.parent.middleChild.dvalue2 = None
+                                z.parent.middleChild.middleChild = None
+                            else:
+                                z.rightChild = z.parent.middleChild.leftChild
+                                z.rightChild.parent = z
+                                z.parent.middleChild.dvalue1 = z.parent.middleChild.dvalue2
+                                z.parent.middleChild.dvalue2 = None
+                                z.parent.middleChild.leftChild = z.parent.middleChild.middleChild
+                                z.parent.middleChild.middleChild = None
+
+                        #*** TODO : In either cases, discriminant values have to be updated. Haven't written the function yet ***#
+
+                        elif z.parent.middleChild.dvalue2 == None: #If it has 2 leaves, the remaining node can merge with the middleChild
+                            z.parent.middleChild.middleChild = z.parent.middleChild.leftChild
+                            z.parent.middleChild.dvalue2 = z.parent.middleChild.middleChild.leafData
+                            if y == z.leftChild:
+                                z.parent.middleChild.leftChild = z.rightChild
+                            else:
+                                z.parent.middleChild.leftChild = z.leftChild
+                            z.parent.middleChild.dvalue1 = z.parent.middleChild.leftChild.leafData
+                            z.parent.leftChild = z.parent.middleChild
+                            z.parent.dvalue1 = z.parent.dvalue2
+                            z.parent.dvalue2 = None
+                            z.parent.middleChild = None
+
+                            #*** TODO: Update Discriminant Values ***#
+
+                    elif z == z.parent.middleChild: #If z was the middleChild
+                        pass #TODO
+
+                    elif z == z.parent.rightChild:  #If z was the rightChild
+                        pass #TODO
+
+                #TODO: z has 1 sibling
+
+
+
+
+            return self
+
 
 myTree = TwoThreeTree(leaf=True,leafData=8)
 myTree = myTree.insert(5)
@@ -251,4 +327,4 @@ for i in range(1000):
     myTree = myTree.insert(random.randrange(-1000,1000))
 
 print(myTree.search(3))
-#myTree.inOrder()
+myTree.inOrder()
