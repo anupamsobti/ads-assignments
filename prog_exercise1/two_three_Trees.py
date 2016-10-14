@@ -300,7 +300,15 @@ class TwoThreeTree():
                             #*** TODO: Update Discriminant Values ***#
 
                     elif z == z.parent.middleChild: #If z was the middleChild
-                        pass #TODO
+                        if z.parent.leftChild.dvalue2 != None:  #The leftchild had 3 children
+                            leftSibling = z.parent.leftChild
+                            if y == z.leftChild:
+                                z.leftChild = leftSibling.rightChild
+                                z.dvalue1 = z.leftChild.leafData
+                                leftSibling.rightChild = leftSibling.middleChild
+                                #** TODO: Update Discriminant value **#
+                                leftSibling.dvalue2 = None
+                                leftSibling.middleChild = None
 
                     elif z == z.parent.rightChild:  #If z was the rightChild
                         pass #TODO
@@ -312,6 +320,14 @@ class TwoThreeTree():
 
             return self
 
+def updateDiscriminantValue(node):
+    #Gets called on the right child whenever the right child is modified
+    while node.parent != None:
+        if node = node.parent.rightChild:
+            node = node.parent
+        elif node = node.parent.middleChild:
+            pass
+    
 
 myTree = TwoThreeTree(leaf=True,leafData=8)
 myTree = myTree.insert(5)
