@@ -259,6 +259,17 @@ class TwoThreeTree():
                     z.rightChild = z.middleChild
                     z.middleChild = None
                     z.dvalue2 = None
+
+                    node = z
+                    while (node.parent != None):    #Updating discriminant values
+                        if node == node.parent.leftChild:
+                            node.parent.dvalue1 = z.rightChild.leafData
+                            break
+                        elif node == node.parent.middleChild:
+                            node.parent.dvalue2 = z.rightChild.leafData
+                            break
+                        node = node.parent
+
             else:   #The node z (parent of y) has 2 children
                 if z.parent != None and z.parent.dvalue2 != None:   #z has 2 siblings
                     if z == z.parent.leftChild:
@@ -341,28 +352,90 @@ class TwoThreeTree():
                                 rightSibling.dvalue2 = None
                                 rightSibling.middleChild = None
                         else:   #Both siblings have 2 children each (One of the siblings has to merge with the middle child)    --> Merging with the leftChild
-                            #TODO
-                            pass
-
+                            leftSibling  = z.parent.leftChild
+                            if y == z.leftChild:
+                                leftSibling.middleChild = leftSibling.rightChild
+                                leftSibling.dvalue2 = leftSibling.middleChild.leafData
+                                leftSibling.rightChild = z.rightChild
+                                leftSibling.rightChild.parent = leftSibling
+                                z.parent.dvalue1 = leftSibling.rightChild.leafData
+                                z.parent.middleChild = None
+                                z.parent.dvalue2 = None
+                            else:   #if y == z.rightChild
+                                leftSibling.middleChild = leftSibling.rightChild
+                                leftSibling.dvalue2 = leftSibling.middleChild.leafData
+                                leftSibling.rightChild = z.leftChild
+                                leftSibling.rightChild.parent = leftSibling
+                                z.parent.dvalue1 = leftSibling.rightChild.leafData
+                                z.parent.middleChild = None
+                                z.parent.dvalue2 = None
 
                     elif z == z.parent.rightChild:  #If z was the rightChild
-                        pass #TODO
+                        middleSibling = z.parent.middleChild
+                        if middleSibling.dvalue2 != None:   #There are 3 children, the right Sibling borrows one
+                            if y == z.leftChild:
+                                z.leftChild = middleSibling.rightChild
+                                z.leftChild.parent = z
+                                z.dvalue1 = z.leftChild.leafData
+                                middleSibling.rightChild = middleSibling.middleChild
+                                middleSibling.parent.dvalue2 = middleSibling.rightChild.leafData
+                                middleSibling.dvalue2 = None
+                                middleSibling.middleChild = None
+                            else:   #if y == z.rightChild:
+                                z.rightChild = z.leftChild
+                                z.leftChild = middleSibling.rightChild
+                                z.leftChild.parent = z
+                                z.dvalue1 = z.leftChild.leafData
+                                middleSibling.rightChild = middleSibling.middleChild
+                                middleSibling.parent.dvalue2 = middleSibling.rightChild.leafData
+                                middleSibling.dvalue2 = None
+                                middleSibling.middleChild = None
+                                
+                                node = z
+                                while (node.parent != None):    #Updating discriminant values
+                                    if node == node.parent.leftChild:
+                                        node.parent.dvalue1 = z.rightChild.leafData
+                                        break
+                                    elif node == node.parent.middleChild:
+                                        node.parent.dvalue2 = z.rightChild.leafData
+                                        break
+                                    node = node.parent
+
+                        elif middleSibling.dvalue2 == None: #The middle sibling also has only 2 children => The middle sibling must merge with the right child (z)
+                            middleSibling.middleChild = middleSibling.rightChild
+                            middleSibling.dvalue2 = middleSibling.middleChild.leafData
+                            middleSibling.parent.dvalue2 = None
+                            middleSibling.parent.middleChild = None
+                            if y == z.leftChild:
+                                middleSibling.rightChild = z.rightChild
+                            else:
+                                middleSibling.rightChild = z.leftChild
+                            middleSibling.rightChild.parent = middleSibling
+                            z = middleSibling
+                            
+                            node = z
+                            while (node.parent != None):    #Updating discriminant values
+                                if node == node.parent.leftChild:
+                                    node.parent.dvalue1 = z.rightChild.leafData
+                                    break
+                                elif node == node.parent.middleChild:
+                                    node.parent.dvalue2 = z.rightChild.leafData
+                                    break
+                                node = node.parent
+
 
                 #TODO: z has 1 sibling
+                if z == z.parent.leftChild:
+                    pass
+
+                else:   #if z = rightChild
+                    pass
 
 
 
 
             return self
 
-def updateDiscriminantValue(node):
-    #Gets called on the right child whenever the right child is modified
-    while node.parent != None:
-        if node = node.parent.rightChild:
-            node = node.parent
-        elif node = node.parent.middleChild:
-            pass
-    
 
 myTree = TwoThreeTree(leaf=True,leafData=8)
 myTree = myTree.insert(5)
@@ -370,12 +443,13 @@ myTree = myTree.insert(4)
 myTree = myTree.insert(9)
 myTree = myTree.insert(3)
 myTree = myTree.insert(6)
-myTree = myTree.insert(10)
-myTree = myTree.insert(0)
+#myTree = myTree.insert(10)
+#myTree = myTree.insert(0)
 
-for i in range(1000):
-    #print("Inserting ",i)
-    myTree = myTree.insert(random.randrange(-1000,1000))
+#for i in range(1000):
+#    myTree = myTree.insert(random.randrange(-1000,1000))
+myTree.inOrder()
+myTree = myTree.delete(5)
 
 print(myTree.search(3))
 myTree.inOrder()
