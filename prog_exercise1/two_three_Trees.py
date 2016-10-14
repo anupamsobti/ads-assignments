@@ -426,13 +426,40 @@ class TwoThreeTree():
 
                 #TODO: z has 1 sibling
                 if z == z.parent.leftChild:
-                    pass
+                    rightSibling = z.parent.rightChild
+                    if rightSibling.dvalue2 != None:    #has 3 children
+                        if y == z.leftChild:
+                            z.leftChild = z.rightChild
+                            z.dvalue1 = z.leftChild.leafData
+                            z.rightChild = rightSibling.leftChild
+                            z.rightChild.parent = z
+                            z.parent.dvalue1 = z.rightChild.leafData
+                        else:   #if y == z.rightChild
+                            z.rightChild = rightSibling.leftChild
+                            z.rightChild.parent = z
+                            z.parent.dvalue1 = z.rightChild.leafData
 
+                        rightSibling.leftChild = rightSibling.middleChild
+                        rightSibling.dvalue1 = rightSibling.dvalue2
+                        rightSibling.middleChild = None
+                        rightSibling.dvalue2 = None
+                    else:   #if rightSibling has only 2 children
+                        
+                        if y == z.leftChild:
+                            remainingChild = z.rightChild
+                        else:
+                            remainingChild = z.leftChild
+
+                        rightSibling.middleChild = rightSibling.leftChild
+                        rightSibling.dvalue2 = rightSibling.dvalue1
+                        rightSibling.leftChild = remainingChild
+                        remainingChild.parent = rightSibling
+                        rightSibling.dvalue1 = remainingChild.leafData
+
+                        return deleteInternalNode(z)
                 else:   #if z = rightChild
-                    pass
-
-
-
+                    leftSibling = z.parent.leftChild
+                    #TODO: Complete this
 
             return self
 
