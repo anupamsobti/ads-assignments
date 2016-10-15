@@ -85,15 +85,30 @@ class listNode():
                 return False,node
 
     def delete(self,x):
-        pass
-
+        isPresent,node = self.search(x)
+        if isPresent:
+            self.noOfNodes -= 1
+            if node.back == None:
+                print("Never expected this")
+            while node != None:
+                node.back.front = node.front
+                node = node.down
+            
 sentinel = -10000
 myList = listNode(sentinel)
 myList = myList.insert(4)
 myList = myList.insert(5)
 myList = myList.insert(1)
 
-for i in range(10000):
-    myList = myList.insert(random.randrange(-9999,10000))
+for i in range(1000):
+    myList = myList.insert(random.randrange(-999,1000))
 
-#print(myList.search(5))
+for i in range(200):
+    myList.delete(random.randrange(-999,1000))
+#for i in range(10000):
+#    myList = myList.insert(random.randrange(-9999,10000))
+
+print(myList.search(5))
+myList.delete(5)
+print(myList.search(5))
+print(myList.noOfNodes)
