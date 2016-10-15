@@ -1,0 +1,39 @@
+
+The input file will contain one operation per line.
+Each line has 2 elements separated by space:
+<operation name><element>
+The operation name can be one of the following:
+i: insert
+d: delete
+s: search
+
+For example
+i 10
+d 5
+s 10
+i 1
+d 10
+
+The name of input file will be input.txt
+
+The output file is expected to have the result of each operation per line.
+The output codes for insert are:
+i <depth>:  for inserted successfully. depth means the path length from root to the inserted element.
+fa: element found already.
+
+The output codes for delete are:
+d <depth>:  deleted successfully. depth means the path length from root to the element to be deleted.
+nf: element not found
+
+The output codes for search are:
+f <depth>:  element found. depth means the path length from root to the accessed element.
+nf: element not found.
+
+For example, the output for above input is :
+i 0
+nf
+f 0
+i 1
+d 0
+
+The name of output file is output.txt
