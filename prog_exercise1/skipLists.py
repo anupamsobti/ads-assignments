@@ -93,7 +93,7 @@ myList = myList.insert(4)
 myList = myList.insert(5)
 myList = myList.insert(1)
 
-for i in range(1000):
-    myList = myList.insert(random.randrange(-1000,1000))
+for i in range(10000):
+    myList = myList.insert(random.randrange(-9999,10000))
 
-print(myList.search(5))
+#print(myList.search(5))
