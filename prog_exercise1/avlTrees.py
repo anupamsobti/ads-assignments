@@ -169,7 +169,7 @@ class AVLTree:
                     k.rightChild = None
 
                 updateHeights(k)
-                print(k.data,balanceFromNode_deletion(k))
+                #print(k.data,balanceFromNode_deletion(k))
                 isRootNew,newRoot = balanceFromNode_deletion(k)
                 if isRootNew:
                     self = newRoot
@@ -212,7 +212,7 @@ class AVLTree:
 
 def balanceFromNode_deletion(node):
     isTreeBalanced,nodes = checkSubtreeBalance_deletion(node)
-    print(checkSubtreeBalance_deletion(node))
+    #print(checkSubtreeBalance_deletion(node))
     if not isTreeBalanced:
         z = nodes[2]
         if z.parent == None:    #Base case - Only 3 elements
@@ -267,48 +267,6 @@ def checkSubtreeBalance(node):
                 x = x.parent
             return True,node
 
-#def checkSubtreeBalance_deletion(node):
-#    x = node
-#    y = node.parent
-#    if y == None:
-#        return True,node
-#    else:
-#        z = node.parent.parent
-#        if z == None:
-#            return True,node
-#        else:
-#            while z != None:
-#                if not z.isNodeBalanced():
-#                    if z.leftChild != None and z.rightChild != None:
-#                        if z.leftChild.height >= z.rightChild.height:
-#                            y = z.leftChild
-#                        elif z.leftChild.height < z.rightChild.height:
-#                            y = z.rightChild
-#                    elif z.leftChild == None:
-#                        y = z.rightChild
-#                    elif z.rightChild == None:
-#                        y = z.leftChild
-#                    else:
-#                        print("not possible")
-#                    
-#                    if y.leftChild != None and y.rightChild != None:
-#                        if y.leftChild.height >= y.rightChild.height:
-#                            x = y.leftChild
-#                        elif y.leftChild.height < y.rightChild.height:
-#                            x = y.rightChild
-#                    elif y.leftChild == None:
-#                        x = y.rightChild
-#                    elif y.rightChild == None:
-#                        x = y.leftChild
-#                    else:
-#                        print("not possible")
-#
-#                    return False,(x,y,z)
-#                z = z.parent
-#                y = y.parent
-#                x = x.parent
-#            return True,node
-
 def checkSubtreeBalance_deletion(node):
     z = node
     while z != None:
@@ -343,97 +301,96 @@ def checkSubtreeBalance_deletion(node):
 
 #Figures out which case it is and balances the tree
 def rotate(nodeX,nodeY,nodeZ):
-    #print(nodeX.data,nodeY.data,nodeZ.data)
-    if nodeZ.leftChild != None:
-        if nodeZ.leftChild.leftChild != None:
-            if nodeX == nodeZ.leftChild.leftChild: #Case 1
-                
-                nodeY.parent = nodeZ.parent
-                if nodeZ.parent != None and nodeZ.parent.leftChild != None:
-                    if nodeZ == nodeZ.parent.leftChild:
-                        nodeZ.parent.leftChild = nodeY
-                if nodeZ.parent != None and nodeZ.parent.rightChild != None:
-                    if nodeZ.parent.rightChild == nodeZ:
-                        nodeZ.parent.rightChild = nodeY
-                    
-                nodeZ.leftChild = nodeY.rightChild
-                if nodeY.rightChild != None:
-                    nodeY.rightChild.parent = nodeZ
-                
-                nodeY.rightChild = nodeZ
-                nodeZ.parent = nodeY
-
-                #Updating heights
-                nodeZ.height -= 2
-
-                updateHeights(nodeY.parent)
-                
-                #print("Rotation Case 1: ",nodeY.data)
-
-                return nodeY
-
-        elif nodeX == nodeZ.leftChild.rightChild: #Case 3
-            nodeX.parent = nodeZ
-            nodeZ.leftChild = nodeX
+    if nodeZ.leftChild != None and nodeZ.leftChild.leftChild != None and nodeX == nodeZ.leftChild.leftChild:
+        #Case 1
+        nodeY.parent = nodeZ.parent
+        if nodeZ.parent != None and nodeZ.parent.leftChild != None:
+            if nodeZ == nodeZ.parent.leftChild:
+                nodeZ.parent.leftChild = nodeY
+        if nodeZ.parent != None and nodeZ.parent.rightChild != None:
+            if nodeZ.parent.rightChild == nodeZ:
+                nodeZ.parent.rightChild = nodeY
             
-            nodeY.rightChild = nodeX.leftChild
-            if nodeX.leftChild != None:
-                nodeX.leftChild.parent = nodeY
-            
-            nodeX.leftChild = nodeY
-            nodeY.parent = nodeX
-
-            nodeY.height -= 1
-            nodeX.height += 1
-
-            #print("Rotation Case 3")
+        nodeZ.leftChild = nodeY.rightChild
+        if nodeY.rightChild != None:
+            nodeY.rightChild.parent = nodeZ
         
-            return rotate(nodeY,nodeX,nodeZ)
+        nodeY.rightChild = nodeZ
+        nodeZ.parent = nodeY
+
+        #Updating heights
+        nodeZ.height -= 2
+
+        updateHeights(nodeY.parent)
+        
+        #print("Rotation Case 1: ",nodeY.data)
+
+        return nodeY
+
+    elif nodeZ.leftChild != None and nodeZ.leftChild.rightChild != None and nodeX == nodeZ.leftChild.rightChild:
+        #Case 2
+        nodeX.parent = nodeZ
+        nodeZ.leftChild = nodeX
+        
+        nodeY.rightChild = nodeX.leftChild
+        if nodeX.leftChild != None:
+            nodeX.leftChild.parent = nodeY
+        
+        nodeX.leftChild = nodeY
+        nodeY.parent = nodeX
+
+        nodeY.height -= 1
+        nodeX.height += 1
+
+        #print("Rotation Case 3")
+        
+        return rotate(nodeY,nodeX,nodeZ)
+ 
+    elif nodeZ.rightChild != None and nodeZ.rightChild.rightChild != None and nodeX == nodeZ.rightChild.rightChild:
+        #Case 3
+        nodeY.parent = nodeZ.parent
+        if nodeZ.parent != None and nodeZ.parent.leftChild != None:
+            if nodeZ == nodeZ.parent.leftChild:
+                nodeZ.parent.leftChild = nodeY
+        if nodeZ.parent != None and nodeZ.parent.rightChild != None:
+            if nodeZ == nodeZ.parent.rightChild:
+                nodeZ.parent.rightChild = nodeY
             
-    if nodeZ.rightChild != None:
-        if nodeZ.rightChild.rightChild != None:
-            if nodeX == nodeZ.rightChild.rightChild: #Case 2
-                nodeY.parent = nodeZ.parent
-                if nodeZ.parent != None and nodeZ.parent.leftChild != None:
-                    if nodeZ == nodeZ.parent.leftChild:
-                        nodeZ.parent.leftChild = nodeY
-                if nodeZ.parent != None and nodeZ.parent.rightChild != None:
-                    if nodeZ == nodeZ.parent.rightChild:
-                        nodeZ.parent.rightChild = nodeY
-                    
-                nodeZ.rightChild = nodeY.leftChild
-                if nodeY.leftChild != None:
-                    nodeY.leftChild.parent = nodeZ
-                
-                nodeY.leftChild = nodeZ
-                nodeZ.parent = nodeY
+        nodeZ.rightChild = nodeY.leftChild
+        if nodeY.leftChild != None:
+            nodeY.leftChild.parent = nodeZ
+        
+        nodeY.leftChild = nodeZ
+        nodeZ.parent = nodeY
 
-                nodeZ.height -=2
-                updateHeights(nodeY.parent)
+        nodeZ.height -=2
+        updateHeights(nodeY.parent)
 
-                #print("Rotation Case 2 : ",nodeY.data)
+        #print("Rotation Case 2 : ",nodeY.data)
 
-                return nodeY
-    
-        elif nodeX == nodeZ.rightChild.leftChild: #Case 4
-            nodeX.parent = nodeZ.rightChild
-            nodeZ.rightChild = nodeX
-            
-            nodeY.leftChild = nodeX.rightChild
-            if nodeX.rightChild != None:
-                nodeX.rightChild.parent = nodeY
-            
-            nodeX.rightChild = nodeY
-            nodeY.parent = nodeX
-            
-            nodeY.height -= 1
-            nodeX.height += 1
+        return nodeY
+ 
+    elif nodeZ.rightChild != None and nodeZ.rightChild.leftChild != None and nodeX == nodeZ.rightChild.leftChild:
+        #Case 4
+        nodeX.parent = nodeZ.rightChild
+        nodeZ.rightChild = nodeX
+        
+        nodeY.leftChild = nodeX.rightChild
+        if nodeX.rightChild != None:
+            nodeX.rightChild.parent = nodeY
+        
+        nodeX.rightChild = nodeY
+        nodeY.parent = nodeX
+        
+        nodeY.height -= 1
+        nodeX.height += 1
 
-            #print("Rotation case 4")
+        #print("Rotation case 4")
 
-            return rotate(nodeY,nodeX,nodeZ)
+        return rotate(nodeY,nodeX,nodeZ)
+
     else:
-        print ("Couldn't figure out case.")
+        print("Couldn't figure out case")
 
 myTree = AVLTree(2)
 #print ("After inserting 2 : ")
@@ -465,6 +422,9 @@ myTree = AVLTree(2)
 
 for i in range(100):
     myTree = myTree.insertNode(random.randrange(100))
+
+for i in range(20):
+    myTree = myTree.deleteNode(random.randrange(100))
 
 myTree.inorderWithHeight()
 print("")
