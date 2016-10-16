@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+import random
 import matplotlib.pyplot as plt
 import networkx as nx
 
@@ -146,6 +147,83 @@ class AVLTree:
         else:
             return self
 
+    def deleteNode(self,value):
+
+        def predecessor(node):
+            a = node.leftChild
+            while a.rightChild != None:
+                a = a.rightChild
+            return a
+
+        isPresent,node = self.searchNode(value)
+        if isPresent:
+            #Base case:
+            if node.parent == None and node.leftChild == None and node.rightChild == None:
+                return None #Deleted the root itself
+            elif node.leftChild == None and node.rightChild == None:
+                #print("Deleting ",node.data)
+                k = node.parent
+                if node == k.leftChild:
+                    k.leftChild = None
+                else:
+                    k.rightChild = None
+
+                updateHeights(k)
+                print(k.data,balanceFromNode_deletion(k))
+                isRootNew,newRoot = balanceFromNode_deletion(k)
+                if isRootNew:
+                    self = newRoot
+            elif node.leftChild == None:
+                k = node.parent
+                if node == k.leftChild:
+                    k.leftChild = node.rightChild
+                    node.rightChild.parent = k
+                    updateHeights(k)
+                else:   #node == k.rightChild
+                    k.rightChild = node.rightChild
+                    node.rightChild.parent = k
+                    updateHeights(k)
+
+                isRootNew,newRoot = balanceFromNode_deletion(k)
+                if isRootNew:
+                    self = newRoot
+            elif node.rightChild == None:
+                k = node.parent
+                if node == k.leftChild:
+                    k.leftChild = node.leftChild
+                    node.leftChild.parent = k
+                else:
+                    k.rightChild = node.leftChild
+                    node.leftChild.parent = k
+                updateHeights(k)
+
+                isRootNew,newRoot = balanceFromNode_deletion(k)
+                if isRootNew:
+                    self = newRoot
+            else:   #A node with both children
+                predecessorNode = predecessor(node)
+                #node.data = predecessorNode.data
+                #return self.deleteNode(predecessorNode.data)
+                self = self.deleteNode(predecessorNode.data)
+                node.data = predecessorNode.data
+                return self
+
+        return self
+
+def balanceFromNode_deletion(node):
+    isTreeBalanced,nodes = checkSubtreeBalance_deletion(node)
+    print(checkSubtreeBalance_deletion(node))
+    if not isTreeBalanced:
+        z = nodes[2]
+        if z.parent == None:    #Base case - Only 3 elements
+            return True,rotate(nodes[0],nodes[1],nodes[2])
+        else:   #z has a parent
+            z = rotate(nodes[0],nodes[1],nodes[2])
+            return balanceFromNode_deletion(z)
+            #return False,z
+    else:
+        return False,node
+
 def balanceFromNode(node):
     isTreeBalanced,nodes = checkSubtreeBalance(node)
     #print(nodes)
@@ -159,14 +237,7 @@ def balanceFromNode(node):
     else:
         return False,node
 
-#def updateHeights(node,prevNodeHeight):
-#    while node != None and node.height < prevNodeHeight + 1:
-#        node.height = prevNodeHeight + 1
-#        #print("New Height of ",node.data," = ",node.height)
-#        prevNodeHeight += 1
-#        node = node.parent
-
-def updateHeights(node):
+def updateHeights(node):    #To be further optimized. Stop when height = required height
     while node != None:
         if node.leftChild != None and node.rightChild != None:
             node.height = max(node.leftChild.height,node.rightChild.height) + 1
@@ -195,6 +266,80 @@ def checkSubtreeBalance(node):
                 y = y.parent
                 x = x.parent
             return True,node
+
+#def checkSubtreeBalance_deletion(node):
+#    x = node
+#    y = node.parent
+#    if y == None:
+#        return True,node
+#    else:
+#        z = node.parent.parent
+#        if z == None:
+#            return True,node
+#        else:
+#            while z != None:
+#                if not z.isNodeBalanced():
+#                    if z.leftChild != None and z.rightChild != None:
+#                        if z.leftChild.height >= z.rightChild.height:
+#                            y = z.leftChild
+#                        elif z.leftChild.height < z.rightChild.height:
+#                            y = z.rightChild
+#                    elif z.leftChild == None:
+#                        y = z.rightChild
+#                    elif z.rightChild == None:
+#                        y = z.leftChild
+#                    else:
+#                        print("not possible")
+#                    
+#                    if y.leftChild != None and y.rightChild != None:
+#                        if y.leftChild.height >= y.rightChild.height:
+#                            x = y.leftChild
+#                        elif y.leftChild.height < y.rightChild.height:
+#                            x = y.rightChild
+#                    elif y.leftChild == None:
+#                        x = y.rightChild
+#                    elif y.rightChild == None:
+#                        x = y.leftChild
+#                    else:
+#                        print("not possible")
+#
+#                    return False,(x,y,z)
+#                z = z.parent
+#                y = y.parent
+#                x = x.parent
+#            return True,node
+
+def checkSubtreeBalance_deletion(node):
+    z = node
+    while z != None:
+        if not z.isNodeBalanced():
+            if z.leftChild != None and z.rightChild != None:
+                if z.leftChild.height >= z.rightChild.height:
+                    y = z.leftChild
+                elif z.leftChild.height < z.rightChild.height:
+                    y = z.rightChild
+            elif z.leftChild == None:
+                y = z.rightChild
+            elif z.rightChild == None:
+                y = z.leftChild
+            else:
+                print("not possible")
+            
+            if y.leftChild != None and y.rightChild != None:
+                if y.leftChild.height >= y.rightChild.height:
+                    x = y.leftChild
+                elif y.leftChild.height < y.rightChild.height:
+                    x = y.rightChild
+            elif y.leftChild == None:
+                x = y.rightChild
+            elif y.rightChild == None:
+                x = y.leftChild
+            else:
+                print("not possible")
+
+            return False,(x,y,z)
+        z = z.parent
+    return True,node
 
 #Figures out which case it is and balances the tree
 def rotate(nodeX,nodeY,nodeZ):
@@ -284,7 +429,7 @@ def rotate(nodeX,nodeY,nodeZ):
             nodeY.height -= 1
             nodeX.height += 1
 
-            print("Rotation case 4")
+            #print("Rotation case 4")
 
             return rotate(nodeY,nodeX,nodeZ)
     else:
@@ -294,9 +439,9 @@ myTree = AVLTree(2)
 #print ("After inserting 2 : ")
 #myTree.inorder()
 
-for i in range(11):
-    print(i)
-    myTree = myTree.insertNode(i)
+#for i in range(101):
+#    #print(i)
+#    myTree = myTree.insertNode(i)
 
 #myTree = myTree.insertNode(0)
 #myTree = myTree.insertNode(1)
@@ -314,8 +459,14 @@ for i in range(11):
 #myTree = myTree.insertNode(8)
 #print("Inserting -1")
 #myTree = myTree.insertNode(-1)
+#myTree = myTree.deleteNode(3)
+#myTree = myTree.deleteNode(5)
 ##print("After inserting 3,5,1,4,-1")
+
+for i in range(100):
+    myTree = myTree.insertNode(random.randrange(100))
+
 myTree.inorderWithHeight()
-#print("")
+print("")
 #print(myTree.isTreeBalanced())
 createDiagram(myTree,myTree.data)
