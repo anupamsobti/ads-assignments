@@ -111,83 +111,94 @@ class AVLTree:
                 return False
         return True
 
-    def insertNode(self,value):
-        if value <= self.data:
+    def searchNode(self,value):
+        if value == self.data:
+            return True,self
+        elif value < self.data:
             if self.leftChild == None:
-                self.leftChild = AVLTree(value)
-                self.leftChild.parent = self
-
-                updateHeights(self.leftChild,self.leftChild.height)
-                balancingResult = balanceFromNode(self.leftChild)    
-                if balancingResult == 0:
-                    return self
-                else:
+                return False,self
             else:
-                self.leftChild.insertNode(value)
+                return self.leftChild.searchNode(value)
+        else:   #Value > self.data
+            if self.rightChild == None:
+                return False,self
+            else:
+                return self.rightChild.searchNode(value)
+
+    def insertNode(self,value):
+        isPresent,node = self.searchNode(value)
+        if not isPresent:
+            if value > node.data:
+                node.rightChild = AVLTree(data = value,parent = node)
+                newNode = node.rightChild
+            else:   #value < node.data
+                node.leftChild = AVLTree(data = value,parent = node)
+                newNode = node.leftChild
+
+            updateHeights(node)
+            isRootNew,newRoot = balanceFromNode(newNode)
+            if isRootNew:
+                if newRoot == None:
+                    print("shit")
+                return newRoot
+            else:
                 return self
         else:
-            if self.rightChild == None:
-                self.rightChild = AVLTree(value)
-                self.rightChild.parent = self
-                
-                updateHeights(self.rightChild,self.rightChild.height)
-                balanceFromNode(self.rightChild)
-
-                balancedTree = balanceFromNode(self.rightChild)
-                return balancedTree
-                
-            else:
-                self.rightChild.insertNode(value)
-                return self
+            return self
 
 def balanceFromNode(node):
-    balancingResult = checkSubtreeBalance(node)
-    print ("Checking Subtree Balance", node.data,balancingResult)
-    if not balancingResult[0]:
-        print(balancingResult[1].data)
+    isTreeBalanced,nodes = checkSubtreeBalance(node)
+    #print(nodes)
+    if not isTreeBalanced:
+        z = nodes[2]
+        if z.parent == None:    #Base case - Only 3 elements
+            return True,rotate(nodes[0],nodes[1],nodes[2])
+        else:   #z has a parent
+            z = rotate(nodes[0],nodes[1],nodes[2])
+            return False,z
+    else:
+        return False,node
 
-    if (not balancingResult[0]) and node.parent != None and node.parent.parent != None:
-        while node.parent.parent != balancingResult[1]:
-            node=node.parent
-        resultingRoot = rotate(node,node.parent,node.parent.parent)
-        if resultingRoot.parent == None:
-            return resultingRoot
+#def updateHeights(node,prevNodeHeight):
+#    while node != None and node.height < prevNodeHeight + 1:
+#        node.height = prevNodeHeight + 1
+#        #print("New Height of ",node.data," = ",node.height)
+#        prevNodeHeight += 1
+#        node = node.parent
+
+def updateHeights(node):
+    while node != None:
+        if node.leftChild != None and node.rightChild != None:
+            node.height = max(node.leftChild.height,node.rightChild.height) + 1
+        elif node.leftChild != None:
+            node.height = node.leftChild.height + 1
+        elif node.rightChild != None:
+            node.height = node.rightChild.height + 1
         else:
-            return 0
-        #balanceFromNode(resultingRoot)
+            node.height = 1
+        node = node.parent
 
-#Update Heights
-def updateHeights(node,seed):
-    i=0
-    while True:
-        if node.height < seed+i:
-            node.height += 1
-        if node.parent == None:
-            break
-        else:
-            node = node.parent
-            i+=1
-
-#Logic for checking balancing
 def checkSubtreeBalance(node):
-    firstImbalanced = None
-    while True:
-        if node.isNodeBalanced():
-            balanced = True
+    x = node
+    y = node.parent
+    if y == None:
+        return True,node
+    else:
+        z = node.parent.parent
+        if z == None:
+            return True,node
         else:
-            balanced = False
-            firstImbalanced = node
-            break
-        
-        if node.parent == None:
-            break
-        else:
-            node = node.parent
-    
-    return balanced,firstImbalanced
+            while z != None:
+                if not z.isNodeBalanced():
+                    return False,(x,y,z)
+                z = z.parent
+                y = y.parent
+                x = x.parent
+            return True,node
 
 #Figures out which case it is and balances the tree
 def rotate(nodeX,nodeY,nodeZ):
+    #print(nodeX.data,nodeY.data,nodeZ.data)
     if nodeZ.leftChild != None:
         if nodeZ.leftChild.leftChild != None:
             if nodeX == nodeZ.leftChild.leftChild: #Case 1
@@ -209,7 +220,11 @@ def rotate(nodeX,nodeY,nodeZ):
 
                 #Updating heights
                 nodeZ.height -= 2
+
+                updateHeights(nodeY.parent)
                 
+                #print("Rotation Case 1: ",nodeY.data)
+
                 return nodeY
 
         elif nodeX == nodeZ.leftChild.rightChild: #Case 3
@@ -225,10 +240,12 @@ def rotate(nodeX,nodeY,nodeZ):
 
             nodeY.height -= 1
             nodeX.height += 1
+
+            #print("Rotation Case 3")
         
-            rotate(nodeY,nodeX,nodeZ)
+            return rotate(nodeY,nodeX,nodeZ)
             
-    elif nodeZ.rightChild != None:
+    if nodeZ.rightChild != None:
         if nodeZ.rightChild.rightChild != None:
             if nodeX == nodeZ.rightChild.rightChild: #Case 2
                 nodeY.parent = nodeZ.parent
@@ -245,7 +262,12 @@ def rotate(nodeX,nodeY,nodeZ):
                 
                 nodeY.leftChild = nodeZ
                 nodeZ.parent = nodeY
-                
+
+                nodeZ.height -=2
+                updateHeights(nodeY.parent)
+
+                #print("Rotation Case 2 : ",nodeY.data)
+
                 return nodeY
     
         elif nodeX == nodeZ.rightChild.leftChild: #Case 4
@@ -259,25 +281,41 @@ def rotate(nodeX,nodeY,nodeZ):
             nodeX.rightChild = nodeY
             nodeY.parent = nodeX
             
-            rotate(nodeY,nodeX,nodeZ)
+            nodeY.height -= 1
+            nodeX.height += 1
+
+            print("Rotation case 4")
+
+            return rotate(nodeY,nodeX,nodeZ)
     else:
         print ("Couldn't figure out case.")
 
 myTree = AVLTree(2)
 #print ("After inserting 2 : ")
 #myTree.inorder()
-print("Inserting 3.")
-myTree = myTree.insertNode(3)
-print ("Inserting 5.")
-myTree = myTree.insertNode(5)
-print("Inserting 1")
-myTree = myTree.insertNode(1)
-print("Inserting 4")
-myTree = myTree.insertNode(4)
-print("Inserting -1")
-myTree = myTree.insertNode(-1)
-#print("After inserting 3,5,1,4,-1")
+
+for i in range(11):
+    print(i)
+    myTree = myTree.insertNode(i)
+
+#myTree = myTree.insertNode(0)
+#myTree = myTree.insertNode(1)
+
+#print("Inserting 3.")
+#myTree = myTree.insertNode(3)
+#print(myTree.searchNode(3))
+#print ("Inserting 5.")
+#myTree = myTree.insertNode(5)
+#print("Inserting 1")
+#myTree = myTree.insertNode(1)
+#print("Inserting 4")
+#myTree = myTree.insertNode(6)
+#myTree = myTree.insertNode(7)
+#myTree = myTree.insertNode(8)
+#print("Inserting -1")
+#myTree = myTree.insertNode(-1)
+##print("After inserting 3,5,1,4,-1")
 myTree.inorderWithHeight()
-print("")
-print(myTree.isTreeBalanced())
-createDiagram(myTree,2)
+#print("")
+#print(myTree.isTreeBalanced())
+createDiagram(myTree,myTree.data)
