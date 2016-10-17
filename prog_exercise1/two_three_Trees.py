@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+import sys
 import random
 
 def largestValue(node):
@@ -492,6 +493,12 @@ class TwoThreeTree():
         if self.rightChild != None:
             self.rightChild.inOrder()
 
+    def depth(self):
+        count = 0
+        while self != None:
+            count += 1
+            self = self.parent
+        return count
 
     def delete(self,x):
         isPresent,y = self.search(x)  #Returns the leaf containing x or just > x
@@ -760,7 +767,7 @@ class TwoThreeTree():
         return self
 
 
-myTree = TwoThreeTree(leaf=True,leafData=8)
+#myTree = TwoThreeTree(leaf=True,leafData=8)
 #myTree = myTree.insert(5)
 #myTree = myTree.insert(4)
 #myTree = myTree.insert(9)
@@ -781,16 +788,65 @@ myTree = TwoThreeTree(leaf=True,leafData=8)
 #print(myTree.search(5))
 ##myTree.inOrder()
 
-for i in range(1000000):
-    myTree = myTree.insert(random.randrange(0,1000000))
-    #myList = myList.insert(i)
-
-#for i in range(500000):
-#    myTree.search(random.randrange(0,1000000))
+#for i in range(1000000):
+#    myTree = myTree.insert(random.randrange(0,1000000))
 #    #myList = myList.insert(i)
+#
+##for i in range(500000):
+##    myTree.search(random.randrange(0,1000000))
+##    #myList = myList.insert(i)
+#
+#for i in range(500000):
+#    myTree = myTree.delete(random.randrange(0,1000000))
+#    #myList = myList.insert(i)
+#
+#
 
-for i in range(500000):
-    myTree = myTree.delete(random.randrange(0,1000000))
-    #myList = myList.insert(i)
+#Subroutine for reading input file and populating output file
+myTree = None
 
+import re
+outputFile = open("output.txt","w")
 
+with open(sys.argv[-1]) as f:
+    for line in f:
+        #print(line)
+        operation,value = re.split('\s',line)[:2]
+        #print("Input : ",operation,value)
+        if myTree == None and operation == "i":
+            myTree = TwoThreeTree(leaf = True,leafData = int(value))
+            #print("i","0")
+            outputFile.write("i 0\n")
+        elif myTree != None and operation == "i":
+            isPresent,node = myTree.search(int(value))
+            if not isPresent:
+                myTree = myTree.insert(int(value))
+                outputFile.write("i " + str(myTree.search(int(value))[1].depth()) + "\n")
+            else:
+                #print("fa")
+                outputFile.write("fa\n")
+        elif myTree == None and operation == "s":
+            #print("nf")
+            outputFile.write("nf\n")
+        elif myTree != None and operation == "s":
+            isPresent,node = myTree.search(int(value))
+            if isPresent:
+                #print("f",myTree.height - node.height)
+                outputFile.write("f " + str(node.depth()) + "\n")
+            else:
+                #print("nf")
+                outputFile.write("nf\n")
+        elif myTree != None and operation == "d":
+            isPresent,node = myTree.search(int(value))
+            if isPresent:
+                #print("d",myTree.height - node.height)
+                outputFile.write("d " + str(node.depth()) + "\n")
+                myTree = myTree.delete(int(value))
+            else:
+                #print("nf")
+                outputFile.write("nf\n")
+        else:
+            print("Invalid Input")
+
+f.close()
+outputFile.close()

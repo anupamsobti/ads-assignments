@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+import sys
 import random
 #import matplotlib.pyplot as plt
 #import networkx as nx
@@ -160,6 +161,13 @@ class AVLTree:
             #Base case:
             if node.parent == None and node.leftChild == None and node.rightChild == None:
                 return None #Deleted the root itself
+            elif node.parent == None:
+                predecessorNode = predecessor(node)
+                #node.data = predecessorNode.data
+                #return self.deleteNode(predecessorNode.data)
+                self = self.deleteNode(predecessorNode.data)
+                node.data = predecessorNode.data
+                return self
             elif node.leftChild == None and node.rightChild == None:
                 #print("Deleting ",node.data)
                 k = node.parent
@@ -392,7 +400,7 @@ def rotate(nodeX,nodeY,nodeZ):
     else:
         print("Couldn't figure out case")
 
-myTree = AVLTree(2)
+#myTree = AVLTree(2)
 #print ("After inserting 2 : ")
 #myTree.inorder()
 
@@ -431,13 +439,63 @@ myTree = AVLTree(2)
 #print(myTree.isTreeBalanced())
 #createDiagram(myTree,myTree.data)
 
-for i in range(1000000):
-    myTree = myTree.insertNode(random.randrange(0,1000000))
-
-
+#for i in range(1000000):
+#    myTree = myTree.insertNode(random.randrange(0,1000000))
+#
+#
+##for i in range(500000):
+##    myTree.searchNode(random.randrange(0,1000000))
+#
 #for i in range(500000):
-#    myTree.searchNode(random.randrange(0,1000000))
+#    myTree = myTree.deleteNode(random.randrange(0,1000000))
+#
 
-for i in range(500000):
-    myTree = myTree.deleteNode(random.randrange(0,1000000))
+#Subroutine for reading input file and populating output file
+myTree = None
 
+import re
+outputFile = open("output.txt","w")
+
+with open(sys.argv[-1]) as f:
+    for line in f:
+        #print(line)
+        operation,value = re.split('\s',line)[:2]
+        #print("Input : ",operation,value)
+        if myTree == None and operation == "i":
+            myTree = AVLTree(int(value))
+            #print("i","0")
+            outputFile.write("i 0\n")
+        elif myTree != None and operation == "i":
+            isPresent,node = myTree.searchNode(int(value))
+            if not isPresent:
+                myTree = myTree.insertNode(int(value))
+                #print("i",myTree.height - myTree.searchNode(int(value))[1].height)
+                outputFile.write("i " + str(myTree.height - myTree.searchNode(int(value))[1].height) + "\n")
+            else:
+                #print("fa")
+                outputFile.write("fa\n")
+        elif myTree == None and operation == "s":
+            #print("nf")
+            outputFile.write("nf\n")
+        elif myTree != None and operation == "s":
+            isPresent,node = myTree.searchNode(int(value))
+            if isPresent:
+                #print("f",myTree.height - node.height)
+                outputFile.write("f " + str(myTree.height - node.height) + "\n")
+            else:
+                #print("nf")
+                outputFile.write("nf\n")
+        elif myTree != None and operation == "d":
+            isPresent,node = myTree.searchNode(int(value))
+            if isPresent:
+                #print("d",myTree.height - node.height)
+                outputFile.write("d " + str(myTree.height - node.height) + "\n")
+                myTree = myTree.deleteNode(int(value))
+            else:
+                #print("nf")
+                outputFile.write("nf\n")
+        else:
+            print("Invalid Input")
+
+f.close()
+outputFile.close()

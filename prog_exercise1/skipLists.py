@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-import gc
+#import gc
 import sys
 import math
 import random
@@ -121,25 +121,25 @@ class listNode():
                     node.front.back = node.back
                 node = node.down
             
-sentinel = -10000
+sentinel = -32767
 myList = listNode(sentinel)
-myList = myList.insert(4)
-myList = myList.insert(5)
-myList = myList.insert(1)
-
-for i in range(1000000):
-    myList = myList.insert(random.randrange(0,1000000))
-    #myList = myList.insert(i)
-
-#for i in range(500000):
-#    myList.search(random.randrange(0,1000000))
+#myList = myList.insert(4)
+#myList = myList.insert(5)
+#myList = myList.insert(1)
+#
+#for i in range(1000000):
+#    myList = myList.insert(random.randrange(0,1000000))
 #    #myList = myList.insert(i)
-
-for i in range(500000):
-    myList.delete(random.randrange(0,1000000))
-    #myList = myList.insert(i)
-
-gc.collect()
+#
+##for i in range(500000):
+##    myList.search(random.randrange(0,1000000))
+##    #myList = myList.insert(i)
+#
+#for i in range(500000):
+#    myList.delete(random.randrange(0,1000000))
+#    #myList = myList.insert(i)
+#
+#gc.collect()
 
 #for i in range(200):
 #    #myList.delete(random.randrange(-999,1000))
@@ -153,3 +153,53 @@ gc.collect()
 #print("Level : ",myList.search(220)[1].level)
 #print(myList.level)
 #print(myList.noOfNodes)
+
+
+import re
+outputFile = open("output.txt","w")
+
+print("Assumption : All values are greater than -32767")
+with open(sys.argv[-1]) as f:
+    for line in f:
+        #print(line)
+        operation,value = re.split('\s',line)[:2]
+        #print("Input : ",operation,value)
+        if myList == None and operation == "i":
+            myList = AVLTree(int(value))
+            #print("i","0")
+            outputFile.write("i 0\n")
+        elif myList != None and operation == "i":
+            isPresent,node = myList.search(int(value))
+            if not isPresent:
+                myList = myList.insert(int(value))
+                #print("i",myList.height - myList.search(int(value))[1].height)
+                outputFile.write("i " + str(myList.search(int(value))[1].level) + "\n")
+            else:
+                #print("fa")
+                outputFile.write("fa\n")
+        elif myList == None and operation == "s":
+            #print("nf")
+            outputFile.write("nf\n")
+        elif myList != None and operation == "s":
+            isPresent,node = myList.search(int(value))
+            if isPresent:
+                #print("f",myList.height - node.height)
+                outputFile.write("f " + str(node.level) + "\n")
+            else:
+                #print("nf")
+                outputFile.write("nf\n")
+        elif myList != None and operation == "d":
+            isPresent,node = myList.search(int(value))
+            if isPresent:
+                #print("d",myList.height - node.height)
+                outputFile.write("d " + str(node.level) + "\n")
+                myList = myList.delete(int(value))
+            else:
+                #print("nf")
+                outputFile.write("nf\n")
+        else:
+            print("Invalid Input")
+
+f.close()
+outputFile.close()
+
