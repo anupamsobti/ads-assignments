@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+import gc
 import sys
 import math
 import random
@@ -116,7 +117,8 @@ class listNode():
                 print("Never expected this")
             while node != None:
                 node.back.front = node.front
-                node.front.back = node.back
+                if node.front != None:
+                    node.front.back = node.back
                 node = node.down
             
 sentinel = -10000
@@ -125,19 +127,29 @@ myList = myList.insert(4)
 myList = myList.insert(5)
 myList = myList.insert(1)
 
-for i in range(1000):
-    #myList = myList.insert(random.randrange(-999,1000))
-    myList = myList.insert(i)
+for i in range(1000000):
+    myList = myList.insert(random.randrange(0,1000000))
+    #myList = myList.insert(i)
 
-for i in range(200):
-    #myList.delete(random.randrange(-999,1000))
-    myList.delete(i)
+#for i in range(500000):
+#    myList.search(random.randrange(0,1000000))
+#    #myList = myList.insert(i)
+
+for i in range(500000):
+    myList.delete(random.randrange(0,1000000))
+    #myList = myList.insert(i)
+
+gc.collect()
+
+#for i in range(200):
+#    #myList.delete(random.randrange(-999,1000))
+#    myList.delete(i)
 #for i in range(10000):
 #    myList = myList.insert(random.randrange(-9999,10000))
 
-print("Search 5 result : ",myList.search(5))
-print("Search 220 result : ",myList.search(220))
-#myList.delete(5)
-print("Level : ",myList.search(220)[1].level)
-print(myList.level)
-print(myList.noOfNodes)
+#print("Search 5 result : ",myList.search(5))
+#print("Search 220 result : ",myList.search(220))
+##myList.delete(5)
+#print("Level : ",myList.search(220)[1].level)
+#print(myList.level)
+#print(myList.noOfNodes)

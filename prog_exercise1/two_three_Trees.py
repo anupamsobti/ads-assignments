@@ -761,22 +761,36 @@ class TwoThreeTree():
 
 
 myTree = TwoThreeTree(leaf=True,leafData=8)
-myTree = myTree.insert(5)
-myTree = myTree.insert(4)
-myTree = myTree.insert(9)
-myTree = myTree.insert(3)
-myTree = myTree.insert(6)
-myTree = myTree.insert(10)
-myTree = myTree.insert(0)
+#myTree = myTree.insert(5)
+#myTree = myTree.insert(4)
+#myTree = myTree.insert(9)
+#myTree = myTree.insert(3)
+#myTree = myTree.insert(6)
+#myTree = myTree.insert(10)
+#myTree = myTree.insert(0)
+#
+#for i in range(1000):
+#    myTree = myTree.insert(random.randrange(-1000,1000))
+#
+#for i in range(200):
+#    myTree = myTree.delete(random.randrange(-1000,1000))
+#
+##myTree.inOrder()
+##myTree = myTree.delete(5)
+#
+#print(myTree.search(5))
+##myTree.inOrder()
 
-for i in range(1000):
-    myTree = myTree.insert(random.randrange(-1000,1000))
+for i in range(1000000):
+    myTree = myTree.insert(random.randrange(0,1000000))
+    #myList = myList.insert(i)
 
-for i in range(200):
-    myTree = myTree.delete(random.randrange(-1000,1000))
+#for i in range(500000):
+#    myTree.search(random.randrange(0,1000000))
+#    #myList = myList.insert(i)
 
-#myTree.inOrder()
-#myTree = myTree.delete(5)
+for i in range(500000):
+    myTree = myTree.delete(random.randrange(0,1000000))
+    #myList = myList.insert(i)
 
-print(myTree.search(5))
-#myTree.inOrder()
+
