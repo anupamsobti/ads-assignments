@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 import random
-import matplotlib.pyplot as plt
-import networkx as nx
+#import matplotlib.pyplot as plt
+#import networkx as nx
 
 #Drawing Functions
 def hierarchy_pos(G, root, width=1., vert_gap = 0.2, vert_loc = 0, xcenter = 0.5, 
@@ -420,13 +420,24 @@ myTree = AVLTree(2)
 #myTree = myTree.deleteNode(5)
 ##print("After inserting 3,5,1,4,-1")
 
-for i in range(100):
-    myTree = myTree.insertNode(random.randrange(100))
+#for i in range(100):
+#    myTree = myTree.insertNode(random.randrange(100))
+#
+#for i in range(20):
+#    myTree = myTree.deleteNode(random.randrange(100))
 
-for i in range(20):
-    myTree = myTree.deleteNode(random.randrange(100))
-
-myTree.inorderWithHeight()
-print("")
+#myTree.inorderWithHeight()
+#print("")
 #print(myTree.isTreeBalanced())
-createDiagram(myTree,myTree.data)
+#createDiagram(myTree,myTree.data)
+
+for i in range(1000000):
+    myTree = myTree.insertNode(random.randrange(0,1000000))
+
+
+#for i in range(500000):
+#    myTree.searchNode(random.randrange(0,1000000))
+
+for i in range(500000):
+    myTree = myTree.deleteNode(random.randrange(0,1000000))
+

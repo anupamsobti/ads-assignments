@@ -1,0 +1,61 @@
+Skiplists:
+1 million insertions (random)
+
+real	0m42.792s
+user	0m42.684s
+sys	0m0.100s
+
+real	0m38.591s
+user	0m38.492s
+sys	0m0.096s
+
+AVLTree
+1 million insertions (random)
+
+real	0m23.701s
+user	0m23.572s
+sys	0m0.060s
+
+2-3 tree:
+1 million insertions (random)
+
+real	0m22.586s
+user	0m22.520s
+sys	0m0.060s
+
+1 million inserts + half a million searches
+
+AVL
+
+real	0m27.088s
+user	0m27.016s
+sys	0m0.068s
+SkipList
+
+real	0m51.478s
+user	0m51.380s
+sys	0m0.092s
+2_3
+
+real	0m28.520s
+user	0m28.364s
+sys	0m0.060s
+
+
+1 million inserts + half a million deletes
+
+AVL
+
+real	0m32.399s
+user	0m32.324s
+sys	0m0.064s
+SkipList
+
+real	0m51.334s
+user	0m51.212s
+sys	0m0.116s
+2_3
+
+real	0m23.392s
+user	0m23.336s
+sys	0m0.056s

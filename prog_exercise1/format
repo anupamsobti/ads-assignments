@@ -37,3 +37,12 @@ i 1
 d 0
 
 The name of output file is output.txt
+
+
+OrderedSearchTree <program-index><path to input file>
+Where program-index is a number between 1 and 4. Their meaning are as follows :
+1. 2-3 tree
+2. Red Black tree
+3. Height Balanced Tree
+4. Skip List 
+

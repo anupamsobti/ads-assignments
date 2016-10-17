@@ -1,0 +1,9 @@
+\rm -rf __pycache__
+echo AVL
+time ./caller.py 3
+\rm -rf __pycache__
+echo SkipList
+time ./caller.py 4
+\rm -rf __pycache__
+echo 2_3
+time ./caller.py 1
